@@ -1,10 +1,11 @@
 const firebase = require('firebase');
 const functions = require('firebase-functions');
-const admin = require('firebase-admin');
-const serviceAccount = require('./chatkey.json');
+const { admin, db } = require('./utils/admin.js');
 //fb config & db
 const firebaseConfig = require('./firebaseConfig.js');
-const database = require('./databaseURL.js');
+// helpers
+const isEmail = require('./helpers/isEmail.js');
+const isEmpty = require('./helpers/isEmpty.js');
 
 // app server
 const app = require('express')();
@@ -15,12 +16,33 @@ app.use(cors);
 // fb init
 firebase.initializeApp(firebaseConfig);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: database,
-});
+const fbAuth = (req,res,next) => {
+	let idToken;
+	if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+		idToken = req.headers.authorization.split('Bearer ')[1];
+	}	else {
+		console.error('No token found');
+		return res.status(403).json({error: 'Unauthorized'});
+	}
+	//verify token
+	admin.auth().verifyIdToken(idToken)
+		.then(decodedToken => {
+			req.body.user = decodedToken;
+			console.log(decodedToken);
+			return db.collection('users')
+				.where('userId', '==', req.body.user.uid)
+				.limit(1).get();
+		})
+		.then(data => {
+			req.body.user = data.docs[0].data().user;
+			return next();
+		})
+		.catch(err => {
+			console.error('Error while verifying the idToken ', err);
+		  return res.json({error: 'user cannot be empty'});
+		})
 
-const db = admin.firestore();
+};
 
 // messages
 app.get('/messages', (req, res) => {
@@ -43,7 +65,11 @@ app.get('/messages', (req, res) => {
 });
 
 // message
-app.post('/message', (req, res) => {
+app.post('/message', fbAuth, (req, res) => {
+	if (req.body.message.trim() === '') {
+		return res.json({msg: 'Message body cannot be empty'});
+	}
+
   const message = {
     user: req.body.user,
     message: req.body.message,
@@ -59,21 +85,6 @@ app.post('/message', (req, res) => {
       res.json({ error: 'something happened' });
     });
 });
-
-// email format
-const isEmail = (email) => {
-  const mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-  if (email.match(mailformat)) return true;
-  else return false;
-};
-
-//empty string
-const isEmpty = (string) => {
-	if (string !== undefined) {
-		if (string.trim() === '') return true;
-		else return false;
-	}
-};
 
 // signup new user
 app.post('/signup', (req, res) => {
@@ -178,5 +189,6 @@ app.post('/login', (req,res) => {
 		});
 
 });
+
 
 exports.api = functions.region('europe-west1').https.onRequest(app);
