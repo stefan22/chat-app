@@ -69,8 +69,10 @@ const isEmail = (email) => {
 
 //empty string
 const isEmpty = (string) => {
-  if (string.trim() === '') return true;
-  else return false;
+	if (string !== undefined) {
+		if (string.trim() === '') return true;
+		else return false;
+	}
 };
 
 // signup new user
@@ -139,6 +141,42 @@ app.post('/signup', (req, res) => {
         return res.status(500).json({ error: err.code });
       }
     });
+});
+
+// login user
+app.post('/login', (req,res) => {
+	const loginUser = {
+		email: req.body.email,
+		password: req.body.password,
+	};
+
+	let errors = {};
+	 if (isEmpty(loginUser.email)) {
+    errors.email = 'Email field cannot be empty';
+   } 
+   if (isEmpty(loginUser.password)) {
+    errors.password = 'Password field cannot be empty';
+   } 
+	
+	if (Object.keys(errors).length > 0) {
+		return res.status(400).json(errors);
+	}
+
+	firebase.auth().signInWithEmailAndPassword(loginUser.email, loginUser.password)
+		.then((data) => {
+			return data.user.getIdToken();
+		})
+		.then((token) => {
+			return res.json({token});
+		})
+		.catch((err) => {
+			console.error(err);
+			if (err.code === 'auth/wrong-password') {
+				return res.status(403).json({error: 'Wrong password entered, please try again'});
+			}
+			return res.status(500).json({error: err.code});
+		});
+
 });
 
 exports.api = functions.region('europe-west1').https.onRequest(app);
