@@ -1,6 +1,6 @@
 const { isEmpty } = require('../helpers');
 
-const reduceUserDetails = data => {
+const getUserDetails = data => {
 	let userDetails = {};
 	if (!isEmpty(data.bio.trim())) userDetails.bio = data.bio;
 	if (!isEmpty(data.website.trim())) {
@@ -18,4 +18,4 @@ const reduceUserDetails = data => {
 
 
 
-module.exports = {reduceUserDetails};
+module.exports = {getUserDetails};

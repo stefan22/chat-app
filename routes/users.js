@@ -1,14 +1,16 @@
 const { db, admin } = require('../utils/admin.js');
 const firebaseConfig = require('../firebaseConfig.js');
-const { reduceUserDetails} = require('../reducers/reduceUserDetails');
+
+// helpers
+const { isEmail, isEmpty } = require('../helpers');
+const { getuserDetails } = require('../utils/getUserDetails');
 
 
 const firebase = require('firebase');
 // fb init
 firebase.initializeApp(firebaseConfig);
 
-// helpers
-const { isEmail, isEmpty } = require('../helpers');
+
 
 
 // user signup
@@ -81,7 +83,6 @@ exports.userSignup =  (req, res) => {
       }
     });
 }
-
 // user login
 exports.userLogin = (req,res) => {
 	const loginUser = {
@@ -117,7 +118,6 @@ exports.userLogin = (req,res) => {
 		});
 
 }
-
 // upload image
 exports.uploadImage = (req,res) => {
   const busBoy = require('busboy');
@@ -170,7 +170,6 @@ exports.uploadImage = (req,res) => {
 
 
 }
-
 // add user details
 exports.addUserDetails = (req,res) => {
   let userDetails = reduceUserDetails(req.body);
@@ -183,5 +182,30 @@ exports.addUserDetails = (req,res) => {
     console.error(err);
     return res.status(500).json({error: err.code});
   });
+
+}
+
+// get own user details
+exports.getAuthenticatedUser = (req,res) => {
+  let userData = {};
+  db.doc(`/users/${req.body.user}`).get()
+    .then((doc) => {
+      if (doc.exists) {
+        userData.protected = doc.data();
+        return db.collection('likes').where('user','==', req.body.user).get();
+      }
+    })
+    .then((data) => {
+      userData.likes = [];
+      data.forEach((doc) => {
+        userData.likes.push(doc.data());
+      })
+      return res.json(userData);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({error: err.code});
+    }); 
+
 
 }

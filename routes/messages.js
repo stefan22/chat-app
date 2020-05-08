@@ -25,6 +25,34 @@ exports.getMessages = (req, res) => {
 		});
 }
 
+exports.getMessage = (req, res) => {
+  let messageData = {};
+  db.doc(`/messages/${req.params.messageId}`).get()
+    .then((doc) => {
+      if (!doc.exists) {
+        return res.json({error: 'message not found'})
+      }
+      messageData = doc.data();
+      messageData.messageId = doc.id;
+      // message comments
+      return db.collection('comments').where('messageId', '==', req.params.messageId).get();
+    })
+    .then((data) => {
+      messageData.comments = [];
+      data.forEach((doc) => {
+        messageData.comments.push(doc.data());
+      })
+       return res.json(messageData);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.json({error: err.code});
+    })
+
+
+}
+
+
 exports.postMessage = (req, res) => {
 	if (req.body.message.trim() === '') {
 		return res.json({msg: 'Message body cannot be empty'});
