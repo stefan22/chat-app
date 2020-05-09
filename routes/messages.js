@@ -50,7 +50,7 @@ exports.getMessage = (req, res) => {
       console.error(err);
       return res.json({ error: err.code });
     });
-};
+}
 
 exports.postMessage = (req, res) => {
   if (req.body.message.trim() === '') {

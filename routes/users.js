@@ -126,6 +126,7 @@ exports.uploadImage = (req, res) => {
 
   let imageFileName;
   let imageUploaded = {};
+  let imageUrl;
 
   const busboy = new busBoy({ headers: req.headers });
   busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
@@ -162,8 +163,8 @@ exports.uploadImage = (req, res) => {
         },
       })
       .then(() => {
-        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${imageFileName}?alt=media`;
-        return db.doc(`/users/${req.body.user}.update({imageUrl})`);
+        imageUrl = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${imageFileName}?alt=media`;
+        return db.doc(`/users/${req.body.user}.update(${imageUrl})`);
       })
       .then(() => {
         return res.json({ msg: 'image uploaded successfully' });
@@ -177,7 +178,7 @@ exports.uploadImage = (req, res) => {
 };
 // add user details
 exports.addUserDetails = (req, res) => {
-  let userDetails = reduceUserDetails(req.body);
+  let userDetails = getuserDetails(req.body);
   db.doc(`/users/${req.body.user}`)
     .update(userDetails)
     .then((det) => {
