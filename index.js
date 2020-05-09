@@ -6,7 +6,9 @@ const {
   getMessages, 
   postMessage, 
   getMessage, 
-  addMsgComment  
+  addMsgComment,
+  likeMessage,
+  unlikeMessage,  
 } = require('./routes/messages');
 
 // users
@@ -34,8 +36,9 @@ app.get('/message/:messageId', getMessage);
 // delete message
 
 // like message
-
+app.get('/message/:messageId/like', fbAuth, likeMessage);
 // unlike message
+app.get('/message/:messageId/unlike', fbAuth, unlikeMessage);
 
 // comment on message
 app.post('/message/:messageId/comment', fbAuth, addMsgComment)
