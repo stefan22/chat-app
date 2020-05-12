@@ -11,6 +11,7 @@ exports.getMessages = (req, res) => {
           messageId: doc.id,
           user: doc.data().user,
           message: doc.data().message,
+          imageUrl: doc.data().imageUrl,
           createdAt: doc.data().createdAt,
         });
       });

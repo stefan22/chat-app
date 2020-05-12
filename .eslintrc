@@ -15,7 +15,10 @@
   },
   "rules": {
     "no-console": "off",
-    "no-eval": "error"
+    "no-eval": "error",
+    "no-undef": "error",
+    "no-unreachable": "error",
+    "no-unused-vars": "error"
    
   }
 }
