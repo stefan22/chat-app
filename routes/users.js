@@ -22,22 +22,32 @@ exports.userSignup = (req, res) => {
   // email field
   if (isEmpty(newUser.email)) {
     errors.email = 'Email field cannot be empty';
+
   } else if (!isEmail(newUser.email)) {
     errors.email = 'Must be a valid email address';
   }
 
   // password field
-  if (isEmpty(newUser.password))
-    errors.password = 'Password field cannot be empty';
-  if (newUser.password !== newUser.confirmPassword)
-    errors.confirmPassword = 'Passwords do not match';
+  if (isEmpty(newUser.password)) {
+      errors.password = 'Password field cannot be empty';
+  }
+
+  if (isEmpty(newUser.confirmPassword)) {
+      errors.confirmPassword = 'Confirm password field cannot be empty';
+  }
+
+  if (newUser.password !== newUser.confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+  }
 
   // user field
-  if (isEmpty(newUser.user)) errors.user = 'User field cannot be empty';
+  if (isEmpty(newUser.user)) {
+    errors.user = 'User field cannot be empty';
+  }
 
   if (Object.keys(errors).length > 0) {
     console.error(errors);
-    return res.status(400).json(errors);
+    return res.status(400).json({errors});
   }
 
   let token, userId;
@@ -95,7 +105,7 @@ exports.userLogin = (req, res) => {
   }
 
   if (Object.keys(errors).length > 0) {
-    return res.status(400).json(errors);
+    return res.status(400).json({errors});
   }
 
   firebase
