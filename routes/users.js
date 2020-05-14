@@ -29,7 +29,7 @@ exports.userSignup = (req, res) => {
     .get()
     .then((doc) => {
       if (doc.exists) {
-        return res.status(400).json({ user: `user already exists` });
+        return res.status(400).json({ regMsg: `There is already a user with this name. Try a different one.` });
       } else {
         return firebase
           .auth()
@@ -55,8 +55,13 @@ exports.userSignup = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.code === 'auth/email-already-in-use') {
-        return res.status(400).json({ msg: 'email already exists' });
-      } else {
+        return res.status(400).json({ loginMsg: 'There is already an accoun created with this email address.' });
+      }
+      if (err.code === 'auth/weak-password') {
+        return res.status(400).json({regMsg: 'Yahoo weak-like password. Please try again'})
+      }
+
+      else {
         return res.status(500).json({ error: err.code });
       }
     });
