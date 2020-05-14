@@ -68,7 +68,6 @@ exports.userLogin = (req, res) => {
     password: req.body.password,
   };
 
-  
   const { errors, valid } = validateLogin(loginUser);
 
   if (!valid) return res.status(400).json(errors);
@@ -87,9 +86,9 @@ exports.userLogin = (req, res) => {
       if (err.code === 'auth/wrong-password') {
         return res
           .status(403)
-          .json({ msg: 'Wrong password entered, please try again' });
+          .json({ credentials: 'Wrong credentials entered, please try again' });
       }
-      return res.status(500).json({ error: err.code });
+      else return res.status(500).json({ error: err.code });
     });
 };
 // upload image
@@ -151,6 +150,7 @@ exports.uploadImage = (req, res) => {
   });
   busboy.end(req.rawBody);
 };
+
 // add user details
 exports.addUserDetails = (req, res) => {
   let userDetails = getuserDetails(req.body);
