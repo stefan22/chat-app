@@ -1,8 +1,8 @@
 const { db, admin } = require('../utils/admin.js');
 const firebaseConfig = require('../firebaseConfig.js');
 
-// helpers
-const { isEmail, isEmpty } = require('../helpers');
+// utils
+const { validateSignup, validateLogin } = require('../utils/validate');
 const { getuserDetails } = require('../utils/getUserDetails');
 
 const firebase = require('firebase');
@@ -18,37 +18,9 @@ exports.userSignup = (req, res) => {
     confirmPassword: req.body.confirmPassword,
   };
 
-  let errors = {};
-  // email field
-  if (isEmpty(newUser.email)) {
-    errors.email = 'Email field cannot be empty';
+  const { errors, valid } = validateSignup(newUser);
 
-  } else if (!isEmail(newUser.email)) {
-    errors.email = 'Must be a valid email address';
-  }
-
-  // password field
-  if (isEmpty(newUser.password)) {
-      errors.password = 'Password field cannot be empty';
-  }
-
-  if (isEmpty(newUser.confirmPassword)) {
-      errors.confirmPassword = 'Confirm password field cannot be empty';
-  }
-
-  if (newUser.password !== newUser.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match';
-  }
-
-  // user field
-  if (isEmpty(newUser.user)) {
-    errors.user = 'User field cannot be empty';
-  }
-
-  if (Object.keys(errors).length > 0) {
-    console.error(errors);
-    return res.status(400).json({errors});
-  }
+  if (!valid) return res.status(400).json(errors);
 
   let token, userId;
   let profileholder = 'profileholder.png';
@@ -57,7 +29,7 @@ exports.userSignup = (req, res) => {
     .get()
     .then((doc) => {
       if (doc.exists) {
-        return res.json({ msg: `user already exists` });
+        return res.status(400).json({ user: `user already exists` });
       } else {
         return firebase
           .auth()
@@ -96,17 +68,10 @@ exports.userLogin = (req, res) => {
     password: req.body.password,
   };
 
-  let errors = {};
-  if (isEmpty(loginUser.email)) {
-    errors.email = 'Email field cannot be empty';
-  }
-  if (isEmpty(loginUser.password)) {
-    errors.password = 'Password field cannot be empty';
-  }
+  
+  const { errors, valid } = validateLogin(loginUser);
 
-  if (Object.keys(errors).length > 0) {
-    return res.status(400).json({errors});
-  }
+  if (!valid) return res.status(400).json(errors);
 
   firebase
     .auth()
@@ -122,7 +87,7 @@ exports.userLogin = (req, res) => {
       if (err.code === 'auth/wrong-password') {
         return res
           .status(403)
-          .json({ error: 'Wrong password entered, please try again' });
+          .json({ msg: 'Wrong password entered, please try again' });
       }
       return res.status(500).json({ error: err.code });
     });
