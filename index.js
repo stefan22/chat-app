@@ -24,7 +24,11 @@ const fbAuth = require('./utils/fbAuth');
 // app server
 const app = require('express')();
 // middleware
-const cors = require('cors')({ origin: true });
+const cors = require('cors')({ 
+  origin: true ,
+  methods: ['POST','GET','PUT'],
+  credentials: true,
+});
 app.use(cors);
 
 // message(s) routes
