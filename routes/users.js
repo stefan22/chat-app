@@ -1,5 +1,6 @@
 const { db, admin } = require('../utils/admin.js');
 const firebaseConfig = require('../firebaseConfig.js');
+const { uuid } = require("uuidv4");
 
 // utils
 const { validateSignup, validateLogin } = require('../utils/validate');
@@ -105,7 +106,8 @@ exports.uploadImage = (req, res) => {
 
   let imageFileName;
   let imageUploaded = {};
-  let imageUrl;
+  // String for image token
+  let generatedToken = uuid();
 
   const busboy = new busBoy({ headers: req.headers });
   busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
@@ -123,7 +125,7 @@ exports.uploadImage = (req, res) => {
 
     const imageExtension = filename.split('.')[filename.split('.').length - 1];
     // 34892213.png
-    imageFileName = `${Math.round(Math.random() * 100000)}.${imageExtension}`;
+    imageFileName = `${Math.round(Math.random() * 100000).toString()}.${imageExtension}`;
     const filepath = path.join(os.tmpdir(), imageFileName);
     imageUploaded = { filepath, mimetype };
     file.pipe(fs.createWriteStream(filepath));
@@ -138,12 +140,15 @@ exports.uploadImage = (req, res) => {
         metadata: {
           metadata: {
             contentType: imageUploaded.mimetype,
+           //token appended to imageUrl
+            firebaseStorageDownloadTokens: generatedToken,
           },
         },
       })
       .then(() => {
-        imageUrl = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${imageFileName}?alt=media`;
-        return db.doc(`/users/${req.body.user}.update(${imageUrl})`);
+        // Append token to url
+        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${imageFileName}?alt=media&token=${generatedToken}`;
+        return db.doc(`/users/${req.body.user}`).update({ imageUrl });
       })
       .then(() => {
         return res.json({ msg: 'image uploaded successfully' });

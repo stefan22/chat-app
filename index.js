@@ -1,13 +1,13 @@
 const functions = require('firebase-functions');
 
 // messages
-const { 
-  getMessages, 
-  postMessage, 
-  getMessage, 
+const {
+  getMessages,
+  postMessage,
+  getMessage,
   addMsgComment,
   likeMessage,
-  unlikeMessage,  
+  unlikeMessage,
 } = require('./routes/messages');
 
 // users
@@ -24,9 +24,8 @@ const fbAuth = require('./utils/fbAuth');
 // app server
 const app = require('express')();
 // middleware
-const cors = require('cors')({ 
-  origin: true ,
-  methods: ['POST','GET','PUT'],
+const cors = require('cors')({
+  origin: true,
   credentials: true,
 });
 app.use(cors);
@@ -44,7 +43,7 @@ app.get('/message/:messageId/like', fbAuth, likeMessage);
 app.get('/message/:messageId/unlike', fbAuth, unlikeMessage);
 
 // comment on message
-app.post('/message/:messageId/comment', fbAuth, addMsgComment)
+app.post('/message/:messageId/comment', fbAuth, addMsgComment);
 
 // user routes
 app.post('/signup', userSignup);
