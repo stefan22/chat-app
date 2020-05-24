@@ -46,6 +46,7 @@ exports.userSignup = (req, res) => {
       const userCredentials = {
         user: newUser.user,
         email: newUser.email,
+        token,
         createdAt: new Date().toISOString(),
         imageUrl: `https://firebasestorage.googleapis.com/v0/b/${firebaseConfig.storageBucket}/o/${profileholder}?alt=media`,
         userId,
@@ -98,49 +99,46 @@ exports.userLogin = (req, res) => {
     });
 };
 // upload image
+// Upload a profile image for user
 exports.uploadImage = (req, res) => {
-  const busBoy = require('busboy');
-  const path = require('path');
-  const os = require('os');
-  const fs = require('fs');
+  const BusBoy = require("busboy");
+  const path = require("path");
+  const os = require("os");
+  const fs = require("fs");
 
+  const busboy = new BusBoy({ headers: req.headers });
+
+  let imageToBeUploaded = {};
   let imageFileName;
-  let imageUploaded = {};
   // String for image token
   let generatedToken = uuid();
 
-  const busboy = new busBoy({ headers: req.headers });
-  busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-    console.log(
-      'fieldname => ',
-      fieldname,
-      ' filename => ',
-      filename,
-      ' mime ',
-      mimetype
-    );
-    if (mimetype !== 'image/jpeg' && mimetype !== 'image/png') {
-      return res.status(400).json({ error: 'Wrong type file submitted' });
+  busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
+    console.log(fieldname, file, filename, encoding, mimetype);
+    if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
+      return res.status(400).json({ error: "Wrong file type submitted" });
     }
+    // my.image.png => ['my', 'image', 'png']
+    const imageExtension = filename.split(".")[filename.split(".").length - 1];
+    // 32756238461724837.png
+    imageFileName = `${Math.round(
+      Math.random() * 1000000000000
+    ).toString()}.${imageExtension}`;
 
-    const imageExtension = filename.split('.')[filename.split('.').length - 1];
-    // 34892213.png
-    imageFileName = `${Math.round(Math.random() * 100000).toString()}.${imageExtension}`;
     const filepath = path.join(os.tmpdir(), imageFileName);
-    imageUploaded = { filepath, mimetype };
+    imageToBeUploaded = { filepath, mimetype };
     file.pipe(fs.createWriteStream(filepath));
   });
-
-  busboy.on('finish', () => {
+  busboy.on("finish", () => {
     admin
       .storage()
       .bucket()
-      .upload(imageUploaded.filepath, {
+      .upload(imageToBeUploaded.filepath, {
         resumable: false,
         metadata: {
           metadata: {
-            contentType: imageUploaded.mimetype,
-           //token appended to imageUrl
+            contentType: imageToBeUploaded.mimetype,
+            //Generate token to be appended to imageUrl
             firebaseStorageDownloadTokens: generatedToken,
           },
         },
@@ -151,11 +149,11 @@ exports.uploadImage = (req, res) => {
         return db.doc(`/users/${req.body.user}`).update({ imageUrl });
       })
       .then(() => {
-        return res.json({ msg: 'image uploaded successfully' });
+        return res.json({ message: "image uploaded successfully" });
       })
       .catch((err) => {
         console.error(err);
-        return res.json({ error: err.code });
+        return res.status(500).json({ error: "something went wrong" });
       });
   });
   busboy.end(req.rawBody);

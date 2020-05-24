@@ -18,3 +18,5 @@ Google cloud functions (firebase/firestore), Node, & express -  ___Chat-app-clie
 - install firebase cli to serve/run project locally and later to deploy functions
 - postman to test your functions
 
+
+> no cors by proxy or by deploying client to hosting along with functions in google cloud
