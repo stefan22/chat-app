@@ -132,7 +132,7 @@ exports.uploadImage = (req, res) => {
   busboy.on("finish", () => {
     admin
       .storage()
-      .bucket()
+      .bucket(firebaseConfig.storageBucket)
       .upload(imageToBeUploaded.filepath, {
         resumable: false,
         metadata: {
