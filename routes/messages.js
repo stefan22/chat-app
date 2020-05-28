@@ -12,6 +12,7 @@ exports.getMessages = (req, res) => {
           user: doc.data().user,
           message: doc.data().message,
           imageUrl: doc.data().imageUrl,
+          likeCount: doc.data().likeCount,
           createdAt: doc.data().createdAt,
         });
       });

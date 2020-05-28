@@ -4,7 +4,7 @@ const { uuid } = require("uuidv4");
 
 // utils
 const { validateSignup, validateLogin } = require('../utils/validate');
-const { getuserDetails } = require('../utils/getUserDetails');
+const { getUserDetails } = require('../utils/getUserDetails');
 
 const firebase = require('firebase');
 // fb init
@@ -161,7 +161,7 @@ exports.uploadImage = (req, res) => {
 
 // add user details
 exports.addUserDetails = (req, res) => {
-  let userDetails = getuserDetails(req.body);
+  let userDetails = getUserDetails(req.body);
   db.doc(`/users/${req.body.user}`)
     .update(userDetails)
     .then((det) => {

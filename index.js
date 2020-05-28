@@ -65,3 +65,4 @@ app.post('/user/', fbAuth, addUserDetails);
 app.get('/user',  fbAuth, getAuthenticatedUser);
 
 exports.api = functions.region('europe-west1').https.onRequest(app);
+

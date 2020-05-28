@@ -12,7 +12,9 @@
     "node": "10"
   },
   "dependencies": {
+    "@google-cloud/storage": "^5.0.1",
     "busboy": "^0.3.1",
+    "child-process-promise": "^2.2.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "firebase": "^7.14.2",
@@ -26,5 +28,4 @@
     "firebase-functions-test": "^0.2.0"
   },
   "private": true
-
 }
