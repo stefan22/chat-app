@@ -70,8 +70,8 @@ exports.postMessage = (req, res) => {
     .add(message)
     .then((doc) => {
       const resmsg = message;
-      resmsg.id = doc.id;
-      res.json({ msg: `document ${doc.id} created successfully.` });
+      resmsg.messageId = doc.id;
+      res.json({ msg: `document ${resmsg} created successfully.` });
     })
     .catch((err) => {
       console.error(err);
@@ -113,11 +113,12 @@ exports.addMsgComment = (req, res) => {
 }
 
 
-// like message
-exports.likeMessage = (req,res) => {
+exports.likedMessage = (req,res) => {
   //cant like twice
-  const likeDoc = db.collection('likes').where('user','==',req.body.user)
-    .where('messageId','==',req.params.messageId).limit(1);
+  const likeDoc = db.collection('likes')
+    .where('user', '==', req.body.user)
+    .where('messageId','==',req.params.messageId)
+    .limit(1);
   //message handle
   const messageDoc = db.doc(`/messages/${req.params.messageId}`);
 
@@ -144,7 +145,7 @@ exports.likeMessage = (req,res) => {
           return messageDoc.update({likeCount: messageData.likeCount});
         })
         .then(() => {
-          return res.json(messageData);
+          return res.json(messageData)
         })
       }
       else {
@@ -155,7 +156,9 @@ exports.likeMessage = (req,res) => {
       console.error(err);
       res.status(500).json({error: err.code});
     })
+
 }
+
 
 
 // unlike message

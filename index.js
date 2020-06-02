@@ -9,7 +9,7 @@ const {
   postMessage,
   getMessage,
   addMsgComment,
-  likeMessage,
+  likedMessage,
   unlikeMessage,
 } = require('./routes/messages');
 
@@ -42,7 +42,8 @@ app.get('/message/:messageId', getMessage);
 // delete message
 
 // like message
-app.get('/message/:messageId/like', fbAuth, likeMessage);
+app.get('/message/:messageId/like', fbAuth, likedMessage);
+
 // unlike message
 app.get('/message/:messageId/unlike', fbAuth, unlikeMessage);
 
