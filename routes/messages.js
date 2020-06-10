@@ -71,7 +71,7 @@ exports.postMessage = (req, res) => {
     .then((doc) => {
       const resmsg = message;
       resmsg.messageId = doc.id;
-      res.json({ msg: `document ${resmsg.messageId} created successfully.` });
+      res.json(resmsg);
     })
     .catch((err) => {
       console.error(err);
