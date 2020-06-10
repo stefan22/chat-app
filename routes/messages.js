@@ -71,7 +71,7 @@ exports.postMessage = (req, res) => {
     .then((doc) => {
       const resmsg = message;
       resmsg.messageId = doc.id;
-      res.json({ msg: `document ${resmsg} created successfully.` });
+      res.json({ msg: `document ${resmsg.messageId} created successfully.` });
     })
     .catch((err) => {
       console.error(err);
@@ -202,4 +202,26 @@ exports.unlikeMessage = (req,res) => {
       res.status(500).json({error: err.code});
     })
 
+}
+
+
+// delete message
+exports.deleteMessage = (req,res) => {
+  const delDoc = db.doc(`/messages/${req.params.messageId}`);
+  delDoc
+    .get().then((doc) => {
+      if (!doc.exists) {
+        return res.status(404).json({error: 'Message not found'});
+      }
+      else {
+        return delDoc.delete();
+      }
+      
+    })
+    .then(() => {
+        res.json({msg: 'Message deleted successfully'})
+      })
+      .catch(err => {
+        res.staus(500).json({err: err.code})
+      });
 }

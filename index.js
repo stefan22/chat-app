@@ -11,6 +11,7 @@ const {
   addMsgComment,
   likedMessage,
   unlikeMessage,
+  deleteMessage,
 } = require('./routes/messages');
 
 // users
@@ -40,6 +41,7 @@ app.post('/message', fbAuth, postMessage);
 app.get('/message/:messageId', getMessage);
 
 // delete message
+app.delete('/message/:messageId', fbAuth, deleteMessage);
 
 // like message
 app.get('/message/:messageId/like', fbAuth, likedMessage);
