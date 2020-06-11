@@ -41,7 +41,7 @@ app.post('/message', fbAuth, postMessage);
 app.get('/message/:messageId', getMessage);
 
 // delete message
-app.delete('/message/:messageId', fbAuth, deleteMessage);
+app.delete('/messages/:messageId', fbAuth, deleteMessage);
 
 // like message
 app.get('/message/:messageId/like', fbAuth, likedMessage);

@@ -207,21 +207,21 @@ exports.unlikeMessage = (req,res) => {
 
 // delete message
 exports.deleteMessage = (req,res) => {
-  const delDoc = db.doc(`/messages/${req.params.messageId}`);
-  delDoc
-    .get().then((doc) => {
-      if (!doc.exists) {
-        return res.status(404).json({error: 'Message not found'});
-      }
-      else {
-        return delDoc.delete();
-      }
-      
+  const deleteDoc = db.doc(`/messages/${req.params.messageId}`);
+  deleteDoc.get()
+  .then((doc) => {
+    if (!doc.exists) {
+      return res.status(404).json({error: 'Message not found'});
+    }
+    else {
+      return deleteDoc.delete();
+    }
+    
+  })
+  .then(() => {
+      res.json({msg: 'Message deleted successfully'})
     })
-    .then(() => {
-        res.json({msg: 'Message deleted successfully'})
-      })
-      .catch(err => {
-        res.staus(500).json({err: err.code})
-      });
+    .catch(err => {
+      res.staus(500).json({err: err.code})
+    });
 }
