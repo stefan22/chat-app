@@ -197,3 +197,41 @@ exports.getAuthenticatedUser = (req, res) => {
       return res.status(500).json({ error: err.code });
     });
 };
+
+
+
+// get user profile info
+exports.getUserProfileInfo = (req, res) => {
+  let userData = {};
+  db.doc(`/users/${req.params.user}`)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        userData.user = doc.data();
+        return db
+          .collection("messages")
+          .where("user", "==", req.params.user)
+          .get();
+      } else {
+        return res.status(404).json({ errror: "User not found" });
+      }
+    })
+    .then((data) => {
+      userData.messages = [];
+      data.forEach((doc) => {
+        userData.messages.push({
+          message: doc.data().message,
+          createdAt: doc.data().createdAt,
+          user: doc.data().user,
+          imageUrl: doc.data().imageUrl,
+          likeCount: doc.data().likeCount,
+          messageId: doc.id,
+        });
+      });
+      return res.json(userData);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({ error: err.code });
+    });
+};

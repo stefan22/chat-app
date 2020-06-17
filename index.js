@@ -21,6 +21,7 @@ const {
   uploadImage,
   addUserDetails,
   getAuthenticatedUser,
+  getUserProfileInfo
 } = require('./routes/users');
 
 
@@ -66,6 +67,9 @@ app.post('/user/', fbAuth, addUserDetails);
 
 // get user credentials
 app.get('/user',  fbAuth, getAuthenticatedUser);
+
+// get user profile info
+app.get('/users/:user', getUserProfileInfo);
 
 exports.api = functions.region('europe-west1').https.onRequest(app);
 
