@@ -5,8 +5,9 @@
 <h1 align="center">Chat-app</h1>
 
 
-
-Google cloud functions (firebase/firestore), Node, & express -  ___Chat-app-client repo (front-end)___
+```js
+ Google cloud functions (firebase/firestore), Node, & express -  Chat-app-client repo (front-end)
+```
 
 
 ## Install
