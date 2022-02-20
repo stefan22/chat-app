@@ -14,14 +14,13 @@
 
  - Clone repository
  - Install dependencies
- - Firebase CLI
- - Familiar with Firebase, in order to create a new Firebase project, configure sdk, create firestore database and deploy cloud functions
+ - Firebase CLI/ Firestore DB
+ - Firebase Cloud functions/ GCP
  
  
-### Prerequisites
+ 
+### Other
 
-- Nodejs >= 8 
-- Npm >= 5.6
 - Postman
 
 
